@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu thứ hạng điểm thi THPT Quốc Gia 2024</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="montserrat">
+    <h1>Tra cứu thứ hạng điểm thi THPT Quốc Gia 2024</h1>
+
+    <div class="container-sm border border-primary-subtle p-5 my-5 ">
+        <form id="apiForm" class=" align-items-center justify-content-center">
+            <div class="form-row d-flex align-items-center justify-content-center">
+                <div class="form-group col-md-8">
+                    <label for="sbd" class="form-label"><strong>Nhập số báo danh của bạn:</strong></label>
+                    <input type="text" id="sbd" name="sbd" class="form-control">
+                </div>
+                <div class="form-group col-md-3 mx-2">
+                    <label for="combination" class="form-label">Tổ hợp:</label>
+                    <select id="combination" name="combination" class="form-control">
+                        <option value="A00">A00 </option>
+                        <option value="A01">A01</option>
+                        <option value="A02">A02 </option>
+                        <option value="A03">A03 </option>
+                        <option value="A04">A04 </option>
+                        <option value="A05">A05 </option>
+                        <option value="A06">A06 </option>
+                        <option value="A07">A07 </option>
+                        <option value="A08">A08 </option>
+                        <option value="B00">B00 </option>
+                        <option value="B01">B01 </option>
+                        <option value="B02">B02 </option>
+                        <option value="B03">B03 </option>
+                        <option value="B04">B04 </option>
+                        <option value="C00">C00 </option>
+                        <option value="C01">C01 </option>
+                        <option value="C02">C02 </option>
+                        <option value="C03">C03 </option>
+                        <option value="C04">C04 </option>
+                        <option value="D01">D01 </option>
+                        <option value="D02">D02 </option>
+                        <option value="D03">D03 </option>
+                        <option value="D04">D04 </option>
+                        <option value="D05">D05 </option>
+                        <option value="D06">D06 </option>
+                        <option value="D07">D07 </option>
+                        <option value="D08">D08 </option>
+                        <option value="D78">D78 </option>
+                        <option value="D79">D79 </option>
+                        <option value="D80">D80 </option>
+                        <option value="D81">D81 </option>
+                        <option value="D82">D82 </option>
+                        <option value="D83">D83 </option>
+                        <option value="D84">D84 </option>
+                        <option value="D85">D85 </option>
+                        <option value="D86">D86 </option>
+                    </select>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-primary mt-4" onclick="fetchData()">Xem thứ hạng</button>
+            </div>
+        </form>
+    </div>
+    </div>
+
+    <div class="wraploading">
+        <div id="loading" class="loading">
+            <div class="spinner-border text-primary" role="status">
+
+            </div>
+        </div>
+    </div>
+    <div id="result" class="container-sm"></div>
+
+    <script>
+        async function fetchData() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = ``;
+
+            const form = document.getElementById('apiForm');
+            const sbd = form.elements['sbd'].value;
+            const combination = form.elements['combination'].value;
+
+            // Hiển thị loading
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = 'block';
+
+            try {
+                // Gọi các API lần lượt
+                const responses = await Promise.all([
+                    fetch('http://localhost:3000/students/rank3', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ sbd, combination })
+                    }),
+                    fetch('http://localhost:3000/students/rank2', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ sbd, combination })
+                    }),
+                    fetch('http://localhost:3000/students/rank', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ sbd, combination })
+                    })
+                ]);
+
+                const data = await Promise.all(responses.map(response => response.json()));
+
+                // Ẩn loading khi đã nhận được kết quả
+                loadingDiv.style.display = 'none';
+
+                // Hiển thị dữ liệu trả về
+
+                resultDiv.innerHTML = `
+                <div class="border p-2">
+                    <p><strong>SBD:</strong> ${data[2].sbd}</p>
+                    <p><strong>Tổ hợp:</strong> ${data[2].combination}</p>
+                    <p><strong>Tổng điểm:</strong> ${data[2].totalScore}</p>
+                    <p><strong>Điểm thi:</strong></p>
+                    <table class="table table-striped">
+                        <tr><td>Toán</td><td>${data[2].candidate.toan}</td></tr>
+                        <tr><td>Ngữ Văn</td><td>${data[2].candidate.ngu_van}</td></tr>
+                        <tr><td>Ngoại Ngữ</td><td>${data[2].candidate.ngoai_ngu}</td></tr>
+                        <tr><td>Vật Lý</td><td>${data[2].candidate.vat_li}</td></tr>
+                        <tr><td>Hóa Học</td><td>${data[2].candidate.hoa_hoc}</td></tr>
+                        <tr><td>Sinh Học</td><td>${data[2].candidate.sinh_hoc}</td></tr>
+                        <tr><td>Lịch sử</td><td>${data[2].candidate.lich_su}</td></tr>
+                        <tr><td>Địa Lý</td><td>${data[2].candidate.dia_li}</td></tr>
+                        <tr><td>GDCD</td><td>${data[2].candidate.gdcd}</td></tr>
+                        <tr><td>Mã Ngoại Ngữ</td><td>${data[2].candidate.ma_ngoai_ngu}</td></tr>
+                    </table>
+                    <p><strong>Thứ hạng tỉnh:</strong> ${data[1].provincialRank}</p>
+                    <p><strong>Thứ hạng ${data[0].mien}:</strong> ${data[0].provincialRank}</p>
+                    <p><strong>Xếp hạng toàn quốc:</strong> ${data[2].nationalRank}</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                loadingDiv.style.display = 'none';
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '<p style="text-align:center">Số báo danh không hợp lệ!!!</p>';
+            }
+        }
+    </script>
+    <div class="card wraploading">
+        
+        <div class="card-body">
+            <blockquote class="blockquote mb-0">
+                <p> Bản quyền thuộc Bộ Giáo Dục và Đào Tạo </p>
+                <cite>Điểm thi chưa bao gồm các bài thi được phúc khảo. </cite>
+                </footer>
+            </blockquote>
+        </div>
+    </div>
+</body>
+
+</html>

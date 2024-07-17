@@ -6,7 +6,7 @@ const cors = require('cors')
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors)
+app.use(cors()); 
 
 mongoose.connect('mongodb+srv://nguyhonglong2002:VoCm3fdhVCDf9vwK@cluster0.zokt7pa.mongodb.net/thpt?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true });
 

@@ -98,21 +98,21 @@
             try {
                 // Gọi các API lần lượt
                 const responses = await Promise.all([
-                    fetch('http://localhost:3000/students/rank3', {
+                    fetch('https://thpt-iuv1.vercel.app/students/rank3', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ sbd, combination })
                     }),
-                    fetch('http://localhost:3000/students/rank2', {
+                    fetch('https://thpt-iuv1.vercel.app/students/rank2', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({ sbd, combination })
                     }),
-                    fetch('http://localhost:3000/students/rank', {
+                    fetch('https://thpt-iuv1.vercel.app/students/rank', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
